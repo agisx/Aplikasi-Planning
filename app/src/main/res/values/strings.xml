@@ -12,5 +12,6 @@
     <string name="insert_todo">Tambah To Do</string>
     <string name="title">title</string>
     <string name="body">body</string>
+    <string name="startTyping">Start typing</string>
     <string name="date">date</string>
 </resources>

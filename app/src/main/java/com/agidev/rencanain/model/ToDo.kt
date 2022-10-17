@@ -14,13 +14,13 @@ data class ToDo(
     var title: String = "",
 
     @ColumnInfo(name = "todo_body")
-    val body: String = "",
+    var body: String = "",
 
     @ColumnInfo(name = "todo_created_at")
-    val created_at: String = "",
+    val created_at: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta")).time),
 
     @ColumnInfo(name = "todo_updated_at")
-    val updated_at: String = ""
+    var updated_at: String = ""
     ){
 
     @PrimaryKey(autoGenerate = true)
