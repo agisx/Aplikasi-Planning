@@ -1,8 +1,8 @@
 package com.agidev.rencanain
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -21,7 +21,7 @@ import java.util.*
 class ToDoDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityToDoDetailBinding
 
-    private lateinit var toDo: ToDo
+    private var toDo: ToDo = ToDo()
 
     private lateinit var todoDetailTopAppBar: MaterialToolbar
     private lateinit var todoDetailTitle: TextView
@@ -48,25 +48,15 @@ class ToDoDetailActivity : AppCompatActivity() {
                 .build()
     }
 
-    override fun onRestart() {
-        super.onRestart()
-
-        GlobalScope.launch {
-            try {
-                save()
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
+//    on resume
+    override fun onResume() {
+        super.onResume()
 
         GlobalScope.launch {
             try {
                 val id: Int = intent.getIntExtra("id", 0)
 
+                // load data when id not null
                 loadData(id)
             } catch (e: Exception){
                 e.printStackTrace()
@@ -78,35 +68,50 @@ class ToDoDetailActivity : AppCompatActivity() {
         }
     }
 
-//    on resume
-
     private fun loadData(id: Int) {
         try {
             toDo = db.toDoDao().readOneById(id)
-            Log.d("onStart", "onStart: $toDo")
-            todoDetailTitle.text = toDo.title
-            todoDetailBody.text = toDo.body
+            if(toDo.id != null){
+                todoDetailBody.text = toDo.body
+                todoDetailTitle.text = toDo.title
+            }
         } catch (e: Exception){
-            loadData(id)
-
             e.printStackTrace()
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun save(){
         try {
-            toDo.title = todoDetailTitle.text.toString()
-            toDo.body = todoDetailBody.text.toString()
+
+            if(todoDetailTitle.text.isNotEmpty()){
+                toDo.title = todoDetailTitle.text.toString()
+            }else{toDo.title = ""}
+
+            if(todoDetailBody.text.isNotEmpty()){
+                toDo.body = todoDetailBody.text.toString()
+            }else{toDo.body = ""}
 
             val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta"))
             val date = calendar.time
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)
 
             toDo.updated_at = simpleDateFormat
-            if(toDo.id == null){
+
+            // insert when id to do null
+            if(toDo.id == null && (todoDetailTitle.text.isNotEmpty() || todoDetailBody.text.isNotEmpty()))
+            {
                 db.toDoDao().insertToDo(toDo)
             }
-            else
+
+            // delete when title and body empty
+            else if(toDo.id != null && todoDetailTitle.text.isEmpty() && todoDetailBody.text.isEmpty())
+            {
+                db.toDoDao().deleteToDo(toDo)
+            }
+
+            // update when title and body empty
+            else if(toDo.id != null && (todoDetailTitle.text.isNotEmpty() || todoDetailBody.text.isNotEmpty()))
             {
                 db.toDoDao().updateToDo(toDo)
             }

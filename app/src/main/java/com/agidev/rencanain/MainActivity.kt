@@ -2,7 +2,6 @@ package com.agidev.rencanain
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,28 +50,20 @@ class MainActivity : AppCompatActivity() {
             .build()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        GlobalScope.launch {
-            dataSet = db.toDoDao().getToDoList()
-            Log.d("onStart", "onStart: $dataSet")
-
-            loadData(dataSet)
-        }
-
-        loadData(dataSet)
-    }
-
     override fun onResume() {
         super.onResume()
 
         fabTodoList.setOnClickListener {
             val intent = Intent(applicationContext, ToDoDetailActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("id", -1)
 
             startActivity(applicationContext, intent, Bundle.EMPTY)
+        }
+
+        GlobalScope.launch {
+            dataSet = db.toDoDao().getToDoList()
+
+            loadData(dataSet)
         }
     }
 
@@ -83,10 +74,6 @@ class MainActivity : AppCompatActivity() {
         try {
             rvTodoList.adapter = customAdapter
         } catch (e: Exception){
-            rvTodoList = findViewById(R.id.rvTodoList)
-
-            loadData(dataSet)
-
             e.printStackTrace()
         }
     }
@@ -119,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else
                 {
-                    val position: Int = view.getTag() as Int
+                    val position: Int = view.tag as Int
                     val intent = Intent(viewGroup.context, ToDoDetailActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .putExtra("id", dataSet[position].id)

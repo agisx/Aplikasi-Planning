@@ -1,10 +1,9 @@
 package com.agidev.rencanain.model
 
-import androidx.annotation.NonNull
+import android.annotation.SuppressLint
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,6 +15,7 @@ data class ToDo(
     @ColumnInfo(name = "todo_body")
     var body: String = "",
 
+    @SuppressLint("SimpleDateFormat")
     @ColumnInfo(name = "todo_created_at")
     val created_at: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta")).time),
 

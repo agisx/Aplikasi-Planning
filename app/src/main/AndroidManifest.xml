@@ -9,25 +9,34 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Rencanain"
         tools:targetApi="31">
         <activity
-            android:name=".ToDoDetailActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Rencanain.NoActionBar"
-            />
-        <activity
-            android:name=".MainActivity"
+            android:name=".SplashScreenActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
-            android:theme="@style/Theme.Rencanain.NoActionBar">
+            android:label="@string/title_activity_splash_screen"
+            android:theme="@style/Theme.Rencanain.NoActionBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ToDoDetailActivity"
+            android:exported="false"
+            android:label="@string/title_activity_detail"
+            android:theme="@style/Theme.Rencanain.NoActionBar"
+            />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.Rencanain.NoActionBar">
         </activity>
     </application>
 
