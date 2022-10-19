@@ -71,6 +71,10 @@ class ToDoDetailActivity : AppCompatActivity() {
     private fun loadData(id: Int) {
         try {
             toDo = db.toDoDao().readOneById(id)
+            if(toDo == null){
+                toDo = ToDo()
+            }
+
             if(toDo.id != null){
                 todoDetailBody.text = toDo.body
                 todoDetailTitle.text = toDo.title
