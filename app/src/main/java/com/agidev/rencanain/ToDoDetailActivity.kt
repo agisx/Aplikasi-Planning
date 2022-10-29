@@ -3,8 +3,7 @@ package com.agidev.rencanain
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.view.ContextMenu
-import android.view.View
+import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -48,7 +47,22 @@ class ToDoDetailActivity : AppCompatActivity() {
             )
                 .build()
 
-        registerForContextMenu(todoDetailTopAppBar)
+        todoDetailTopAppBar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menuItemDeleteToDoDetail -> {
+                    todoDetailTitle.text = ""
+                    todoDetailTitle.isEnabled = false
+
+                    todoDetailBody.text = ""
+                    todoDetailBody.isEnabled = false
+
+                    todoDetailTopAppBar.isEnabled = false
+
+                    onBackPressed()
+                }
+            }
+            true
+        }
     }
 
     override fun onResume() {
@@ -60,14 +74,14 @@ class ToDoDetailActivity : AppCompatActivity() {
 
         try {
             val bundle = intent.extras
-            val todoList = bundle?.getString("toDo")
+            val bundleToDo = bundle?.getString("toDo")
 
             val gson = Gson()
 
-            val todo = gson.fromJson(todoList, ToDo::class.java)
+            toDo = gson.fromJson(bundleToDo, ToDo::class.java)
 
             // load data when todo is not null
-            loadData(todo)
+            loadData(toDo)
         } catch (e: Exception){
             e.printStackTrace()
         }
@@ -83,10 +97,6 @@ class ToDoDetailActivity : AppCompatActivity() {
 
     private fun loadData(toDo: ToDo = ToDo()) {
         try {
-            if(toDo == null){
-                this.toDo = ToDo()
-            }
-
             try {
                 todoDetailTitle.text = toDo.title
             } catch (e: Exception){
