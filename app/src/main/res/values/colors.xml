@@ -12,10 +12,10 @@
 
 <!--    light mode -->
     <color name="main_color">#325FBC</color>
-    <color name="main_color_variant">#DBE7FF</color>
+    <color name="main_color_variant">#4575D6</color>
 
-    <color name="main_color_second">#FFF5B0</color>
-    <color name="main_color_second_variant">#FFFCEA</color>
+    <color name="main_color_second">#DDC93B</color>
+    <color name="main_color_second_variant">#EFDC55</color>
 <!--    dark mode -->
     <color name="main_color_night">#171819</color>
     <color name="main_color_variant_night">#191A1C</color>

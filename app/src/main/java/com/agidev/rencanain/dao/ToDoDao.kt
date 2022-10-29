@@ -18,7 +18,7 @@ interface ToDoDao {
     @Delete
     fun deleteToDo(@NonNull toDo: ToDo)
 
-    // kustom sql
+    // custom sql
     @Query("Select * from todo_tbl where :id")
     fun readOneById(id: Int): ToDo
 }

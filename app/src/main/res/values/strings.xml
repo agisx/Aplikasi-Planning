@@ -17,4 +17,5 @@
     <string name="startTyping">Start typing</string>
     <string name="date">date</string>
     <string name="developer">Agi</string>
+    <string name="delete">delete</string>
 </resources>

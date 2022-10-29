@@ -16,9 +16,9 @@ import com.agidev.rencanain.database.RencanainDatabase
 import com.agidev.rencanain.databinding.ActivityMainBinding
 import com.agidev.rencanain.model.ToDo
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 @DelicateCoroutinesApi
 class MainActivity : AppCompatActivity() {
@@ -29,8 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fabTodoList: FloatingActionButton
 
     private lateinit var db: RencanainDatabase
-
-    private var dataSet: List<ToDo> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +48,24 @@ class MainActivity : AppCompatActivity() {
             .build()
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        try {
+            val bundle = intent.extras
+            val todoList = bundle?.getString("todo_list")
+
+            val gson = Gson()
+
+            var data: List<ToDo>
+            data = gson.fromJson(todoList, object : TypeToken<List<ToDo>>(){}.type)
+
+            loadData(data)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -58,12 +74,6 @@ class MainActivity : AppCompatActivity() {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
             startActivity(applicationContext, intent, Bundle.EMPTY)
-        }
-
-        GlobalScope.launch {
-            dataSet = db.toDoDao().getToDoList()
-
-            loadData(dataSet)
         }
     }
 
@@ -107,9 +117,13 @@ class MainActivity : AppCompatActivity() {
                 else
                 {
                     val position: Int = view.tag as Int
+
+                    val gson = Gson()
+                    val toDo = gson.toJson(dataSet[position], ToDo::class.java)
+
                     val intent = Intent(viewGroup.context, ToDoDetailActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra("id", dataSet[position].id)
+                        .putExtra("toDo", toDo)
 
                     startActivity(viewGroup.context, intent, Bundle.EMPTY)
                 }

@@ -3,6 +3,8 @@ package com.agidev.rencanain
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.ContextMenu
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -11,9 +13,8 @@ import com.agidev.rencanain.database.RencanainDatabase
 import com.agidev.rencanain.databinding.ActivityToDoDetailBinding
 import com.agidev.rencanain.model.ToDo
 import com.google.android.material.appbar.MaterialToolbar
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.google.gson.Gson
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,48 +47,70 @@ class ToDoDetailActivity : AppCompatActivity() {
                 RencanainDatabase.getDatabaseName
             )
                 .build()
+
+        registerForContextMenu(todoDetailTopAppBar)
     }
 
-//    on resume
     override fun onResume() {
         super.onResume()
-
-        GlobalScope.launch {
-            try {
-                val id: Int = intent.getIntExtra("id", 0)
-
-                // load data when id not null
-                loadData(id)
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
-        }
 
         todoDetailTopAppBar.setNavigationOnClickListener {
             onBackPressed()
         }
+
+        try {
+            val bundle = intent.extras
+            val todoList = bundle?.getString("toDo")
+
+            val gson = Gson()
+
+            val todo = gson.fromJson(todoList, ToDo::class.java)
+
+            // load data when todo is not null
+            loadData(todo)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
     }
 
-    private fun loadData(id: Int) {
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+    }
+
+    private fun loadData(toDo: ToDo = ToDo()) {
         try {
-            toDo = db.toDoDao().readOneById(id)
             if(toDo == null){
-                toDo = ToDo()
+                this.toDo = ToDo()
+            }
+
+            try {
+                todoDetailTitle.text = toDo.title
+            } catch (e: Exception){
+                todoDetailTitle.text = ""
+                e.printStackTrace()
             }
 
             if(toDo.id != null){
-                todoDetailBody.text = toDo.body
-                todoDetailTitle.text = toDo.title
+                try {
+                    todoDetailBody.text = toDo.body
+                } catch (e: Exception){
+                    todoDetailBody.text = ""
+                    e.printStackTrace()
+                }
             }
         } catch (e: Exception){
             e.printStackTrace()
         }
     }
 
+    // TODO: save algorithm
     @SuppressLint("SimpleDateFormat")
     private fun save(){
         try {
-
             if(todoDetailTitle.text.isNotEmpty()){
                 toDo.title = todoDetailTitle.text.toString()
             }else{toDo.title = ""}
@@ -130,11 +153,21 @@ class ToDoDetailActivity : AppCompatActivity() {
 
         GlobalScope.launch {
             save()
-        }
 
-        val intent = Intent(applicationContext, MainActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        ContextCompat.startActivity(applicationContext, intent, Bundle.EMPTY)
+            val dataSet = db.toDoDao().getToDoList()
+
+            val gson = Gson()
+            val data = gson.toJson(dataSet, List::class.java)
+
+            val intent = Intent(applicationContext, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+            intent.putExtra("todo_list", data)
+
+            ContextCompat.startActivity(applicationContext, intent, Bundle.EMPTY)
+
+            finish()
+        }
     }
 }
